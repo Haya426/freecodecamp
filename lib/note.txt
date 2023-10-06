@@ -1,8 +1,4 @@
- Navigator.of(context).pushNamedAndRemoveUntil(
-                '/login/',
-                (route) => false,
-              );
-pressing login button cause error for lack of Scaffold
-ဒါဆိုရင် login view မှာ Scaffold widget ရှိကိုရှိရမယ် 
-မရှိရင် error ပြမယ် 
------------------------------------------------
+to change print to log
+1. import 'dart:developer' as devtools;
+  object ဆိုရင် toString() ထည့် = devtools.log(object.toString());
+  devtools.log('wrong password');
