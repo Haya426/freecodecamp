@@ -1,4 +1,0 @@
-to change print to log
-1. import 'dart:developer' as devtools;
-  object ဆိုရင် toString() ထည့် = devtools.log(object.toString());
-  devtools.log('wrong password');
