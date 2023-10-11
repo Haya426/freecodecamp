@@ -1,8 +1,9 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
+
 import 'package:flutter/material.dart';
 import 'package:freecodecamp/constants/route.dart';
 import 'package:freecodecamp/firebase_options.dart';
+import 'package:freecodecamp/services/auth/auth_exception.dart';
+import 'package:freecodecamp/services/auth/auth_service.dart';
 import 'dart:developer' as devtools show log;
 
 import 'package:freecodecamp/utilities/show_error_dialog.dart';
@@ -63,35 +64,28 @@ class _RegisterViewState extends State<RegisterView> {
               final email = _email.text;
               final password = _password.text;
               try {
-                  await FirebaseAuth.instance.createUserWithEmailAndPassword(
+                  await AuthService.firebase().createUser(
                   email: email,
                   password: password,
                 );
-                final user = FirebaseAuth.instance.currentUser;
-                user?.sendEmailVerification();
+                final user = AuthService.firebase().currentUser;
+                AuthService.firebase().sendEmailVerification();
                 Navigator.of(context).pushNamed(verifyEmailRoute);
-              } on FirebaseAuthException catch (e) {
-                if (e.code == 'weak-password') {
-                  await showErrorDialog(
+              } on WeakPasswordAuthException{
+                 await showErrorDialog(
                     context,
                     'weak password',
                      );
-                } else if (e.code == 'email-already-in-use') {
-                  await showErrorDialog(
+              } on EmailAlreadyInUseAuthException{
+                await showErrorDialog(
                     context,
                     'Email is already in use',
                      );
-                } else if (e.code == 'invalid-email') {
-                  await showErrorDialog(
+              } on InvalidEmailAuthException{
+                 await showErrorDialog(
                     context,
                     'This is Invalid email Address',
                      );
-                } else{
-                  await showErrorDialog(
-                    context,
-                    'Error: ${e.code}',
-                     );
-                }
               } catch (e) {
                 await showErrorDialog(
                     context,

@@ -1,8 +1,9 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'dart:developer' as devtools show log;
 
 import 'package:freecodecamp/constants/route.dart';
+import 'package:freecodecamp/services/auth/auth_exception.dart';
+import 'package:freecodecamp/services/auth/auth_service.dart';
 
 import '../utilities/show_error_dialog.dart';
 
@@ -62,12 +63,12 @@ class _LoginViewState extends State<LoginView> {
               final email = _email.text;
               final password = _password.text;
               try {
-                await FirebaseAuth.instance.signInWithEmailAndPassword(
+                await AuthService.firebase().LogIn(
                   email: email,
                   password: password,
                 );
-                final user = await FirebaseAuth.instance.currentUser;
-                if(user?.emailVerified?? false){
+                final user = await AuthService.firebase().currentUser;
+                if(user?.isEmailVerified?? false){
                   //user's email is verified
                    Navigator.of(context).pushNamedAndRemoveUntil(
                     notesRoute,
@@ -81,23 +82,16 @@ class _LoginViewState extends State<LoginView> {
                    );
                 }
                
-              } on FirebaseAuthException catch (e) {
-                if (e.code == 'user-not-found') {
-                 await showErrorDialog(
+              } on UserNotFoundAuthException {
+                await showErrorDialog(
                   context,
                   'User not found',
                   );
-                } else if (e.code == 'wrong-password') {
-                  await showErrorDialog(
+              } on WrongPasswordAuthException{
+                await showErrorDialog(
                   context,
                   'Wrong credentials',
                   );
-                } else {
-                  await showErrorDialog(
-                  context,
-                  'ErrorL: ${e.code}',
-                  );
-                }
               } catch (e) {
                 // catch all exceptions
                 await showErrorDialog(
