@@ -3,7 +3,8 @@ import 'package:freecodecamp/constants/route.dart';
 import 'package:freecodecamp/firebase_options.dart';
 import 'package:freecodecamp/services/auth/auth_service.dart';
 import 'package:freecodecamp/views/login_view.dart';
-import 'package:freecodecamp/views/notes_view.dart';
+import 'package:freecodecamp/views/notes/new_note_view.dart';
+import 'package:freecodecamp/views/notes/notes_view.dart';
 import 'package:freecodecamp/views/register_view.dart';
 import 'package:freecodecamp/views/verify_email_view.dart';
 import 'dart:developer' as devtools show log;
@@ -25,6 +26,7 @@ void main() {
         registerRoute: (context) => const RegisterView(),
         notesRoute: (context) => const NotesView(),
         verifyEmailRoute:(context) => const VerifyEmailView(),
+        newNoteRoute:(context) => const NewNoteView(),
       },
     ),
   );

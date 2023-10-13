@@ -4,7 +4,7 @@ import 'package:freecodecamp/constants/route.dart';
 import 'package:freecodecamp/services/auth/auth_service.dart';
 import 'package:freecodecamp/services/crud/note_service.dart';
 
-import '../enums/menu_action.dart';
+import '../../enums/menu_action.dart';
 
 class NotesView extends StatefulWidget {
   const NotesView({Key? key}) : super(key: key);
@@ -33,8 +33,13 @@ class _NotesViewState extends State<NotesView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Main UI'),
+        title: const Text('Your notes'),
         actions: [
+          IconButton(
+            onPressed: (){
+              Navigator.of(context).pushNamed(newNoteRoute);
+            },
+            icon: const Icon(Icons.add)),
           PopupMenuButton<MenuAction>(
             onSelected: (value) async {
               switch (value) {
@@ -78,7 +83,11 @@ class _NotesViewState extends State<NotesView> {
             default: 
               return const CircularProgressIndicator();
           }  
-        })
+        }),
+      floatingActionButton: FloatingActionButton(
+        onPressed: (){
+          
+        }),
     );
   }
 }
