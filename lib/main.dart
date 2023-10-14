@@ -3,19 +3,17 @@ import 'package:freecodecamp/constants/route.dart';
 import 'package:freecodecamp/firebase_options.dart';
 import 'package:freecodecamp/services/auth/auth_service.dart';
 import 'package:freecodecamp/views/login_view.dart';
-import 'package:freecodecamp/views/notes/new_note_view.dart';
+import 'package:freecodecamp/views/notes/create_update_note_view.dart';
 import 'package:freecodecamp/views/notes/notes_view.dart';
 import 'package:freecodecamp/views/register_view.dart';
 import 'package:freecodecamp/views/verify_email_view.dart';
 import 'dart:developer' as devtools show log;
 
 import 'enums/menu_action.dart';
-
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(
     MaterialApp(
-      debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
         primarySwatch: Colors.blue,
@@ -25,8 +23,8 @@ void main() {
         loginRoute: (context) => const LoginView(),
         registerRoute: (context) => const RegisterView(),
         notesRoute: (context) => const NotesView(),
-        verifyEmailRoute:(context) => const VerifyEmailView(),
-        newNoteRoute:(context) => const NewNoteView(),
+        verifyEmailRoute: (context) => const VerifyEmailView(),
+        createOrUpdateNoteRoute: (context) => const CreateUpdateNoteView(),
       },
     ),
   );
