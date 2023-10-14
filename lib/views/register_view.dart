@@ -1,13 +1,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:freecodecamp/constants/route.dart';
-import 'package:freecodecamp/firebase_options.dart';
 import 'package:freecodecamp/services/auth/auth_exception.dart';
 import 'package:freecodecamp/services/auth/auth_service.dart';
+import 'package:freecodecamp/utilities/dialogs/error_dialog.dart';
 import 'dart:developer' as devtools show log;
-
-import 'package:freecodecamp/utilities/show_error_dialog.dart';
-
 class RegisterView extends StatefulWidget {
   const RegisterView({Key? key}) : super(key: key);
 

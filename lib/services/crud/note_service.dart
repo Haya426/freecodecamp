@@ -9,13 +9,13 @@ class NotesService {
   Database? _db;
 
   List<DatabaseNote> _notes = [];
-  //create singleton 
+
   static final NotesService _shared = NotesService._sharedInstance();
-  NotesService._sharedInstance(){
+  NotesService._sharedInstance() {
     _notesStreamController = StreamController<List<DatabaseNote>>.broadcast(
-      onListen: (){
+      onListen: () {
         _notesStreamController.sink.add(_notes);
-      }
+      },
     );
   }
   factory NotesService() => _shared;
@@ -329,4 +329,4 @@ const createNoteTable = '''CREATE TABLE IF NOT EXISTS "note" (
         "is_synced_with_cloud"	INTEGER NOT NULL DEFAULT 0,
         FOREIGN KEY("user_id") REFERENCES "user"("id"),
         PRIMARY KEY("id" AUTOINCREMENT)
-      );''';         
+      );''';

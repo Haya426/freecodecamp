@@ -3,7 +3,7 @@ import 'dart:developer' as devtools show log;
 import 'package:freecodecamp/constants/route.dart';
 import 'package:freecodecamp/services/auth/auth_exception.dart';
 import 'package:freecodecamp/services/auth/auth_service.dart';
-import '../utilities/show_error_dialog.dart';
+import 'package:freecodecamp/utilities/dialogs/error_dialog.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({Key? key}) : super(key: key);
