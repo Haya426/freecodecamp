@@ -26,7 +26,7 @@ class FirebaseClaudStorage {
       documentId: fetchedNote.id, 
       ownerUserId: ownerUserId, 
       text: '',
-      );
+       );
   }
   //delte note
   Future<void> deleteNote({required String documentId}) async {

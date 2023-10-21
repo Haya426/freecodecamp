@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
+import 'package:freecodecamp/services/claud/claud_note.dart';
 import 'package:freecodecamp/services/crud/note_service.dart';
 import 'package:freecodecamp/utilities/dialogs/delete_dialog.dart';
 
@@ -24,10 +25,10 @@ import 'package:freecodecamp/utilities/dialogs/delete_dialog.dart';
 //   print(myCalculator(8, 2)); // Output: 6
 // }
 
-typedef NoteCallback = void Function(DatabaseNote note);
+typedef NoteCallback = void Function(ClaudNote note);
 
 class NotesListView extends StatelessWidget {
-  final List<DatabaseNote> notes;
+  final Iterable<ClaudNote> notes;
   final NoteCallback onDeleteNote;
   final NoteCallback onTap;
 
@@ -43,7 +44,7 @@ class NotesListView extends StatelessWidget {
     return ListView.builder(
       itemCount: notes.length,
       itemBuilder: (context, index) {
-        final note = notes[index];
+        final note = notes.elementAt(index);
         return ListTile(
           onTap: (){
             onTap(note);
