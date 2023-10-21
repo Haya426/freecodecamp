@@ -12,7 +12,7 @@ void main() {
 
     test('Cannot log out if not initialized', () {
       expect(
-        provider.LogOut(),
+        provider.logOut(),
         throwsA(const TypeMatcher<NotInitializedException>()),
       );
     });
@@ -67,8 +67,8 @@ void main() {
     });
 
     test('Should be able to log out and log in again', () async {
-      await provider.LogOut();
-      await provider.LogIn(
+      await provider.logOut();
+      await provider.logIn(
         email: 'email',
         password: 'password',
       );
@@ -92,7 +92,7 @@ class MockAuthProvider implements AuthProvider {
   }) async {
     if (!isInitialized) throw NotInitializedException();
     await Future.delayed(const Duration(seconds: 1));
-    return LogIn(
+    return logIn(
       email: email,
       password: password,
     );
@@ -108,20 +108,24 @@ class MockAuthProvider implements AuthProvider {
   }
 
   @override
-  Future<AuthUser> LogIn({
+  Future<AuthUser> logIn({
     required String email,
     required String password,
   }) {
     if (!isInitialized) throw NotInitializedException();
     if (email == 'mabuphongram171@gmail.com') throw UserNotFoundAuthException();
     if (password == 'foobar') throw WrongPasswordAuthException();
-    const user = AuthUser(isEmailVerified: false, email: 'mabuphongram171@gmail.com');
+    const user = AuthUser(
+      id: 'my_id',
+      isEmailVerified: false, 
+      email: 'mabuphongram171@gmail.com'
+      );
     _user = user;
     return Future.value(user);
   }
 
   @override
-  Future<void> LogOut() async {
+  Future<void> logOut() async {
     if (!isInitialized) throw NotInitializedException();
     if (_user == null) throw UserNotFoundAuthException();
     await Future.delayed(const Duration(seconds: 1));
@@ -133,7 +137,10 @@ class MockAuthProvider implements AuthProvider {
     if (!isInitialized) throw NotInitializedException();
     final user = _user;
     if (user == null) throw UserNotFoundAuthException();
-    const newUser = AuthUser(isEmailVerified: true, email: 'mabuphongram@gmail.com');
+    const newUser = AuthUser(
+      id: 'my_id',
+      isEmailVerified: true, 
+      email: 'mabuphongram@gmail.com');
     _user = newUser;
   }
 }
