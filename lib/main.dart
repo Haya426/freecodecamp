@@ -4,12 +4,22 @@ import 'dart:developer' as devtools show log;
 extension Log on Object{
   void log() => devtools.log(toString());
 }
-// 'Abstract' mean no logic or empty
-// 'no abstract' means logic
+// Abstract can have attributes
 
 abstract class CanRun{
+  String get type{
+    if(this is Cat) { // check current instance is Cat?
+      return "cat";
+    } else if (this is Dog){ // check current instance is Dog?
+      return "dog";
+    }
+     else {
+      return 'something else';
+    }
+  }
   @mustCallSuper // it push to invoke super class, 
   void run(){
+    
     "can run function is called".log();
   } // normal function
 }
@@ -22,10 +32,15 @@ class Cat extends CanRun {
 
   }
 }
+class Dog extends CanRun {
+
+}
 
 void testIt(){
-    final cat  = Cat();
-    cat.run();
+    final cat  = Cat(); // 'this' is now Cat
+    cat.type.log();  
+    final dog = Dog(); // 'this' is now Dog
+    dog.type.log();
   }
 
 void main() {
