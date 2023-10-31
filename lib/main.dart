@@ -4,44 +4,29 @@ import 'dart:developer' as devtools show log;
 extension Log on Object{
   void log() => devtools.log(toString());
 }
-//Abstract class can have contructors
-//When an abstract class has a constructor,it cannot be mixed into other classes
-// for example, class Cat with CanRun{} will araise error
-//ဆိုလိုချင်တာ abstract class မှာ contructor ရှိပြီဆိုတာနဲ့ mixin feature မရတော့ဘူး
-enum Type {cat,dog}
-
+// mixin mean to implement functions from many abstract classes
 abstract class CanRun{
-  final Type type;
-  //constructor
-  const CanRun({required this.type});
 
-  @mustCallSuper // it push to invoke super class, 
   void run(){
-    
-    "can run function is called".log();
-  } // normal function
+    'Running...'.log();
+  } 
 }
-
-
-class Cat extends CanRun {
-  const Cat(): super(type:Type.cat);
-  @override
-  void run() { // If empty body does not invoke super class
-    super.run();
-    'cat running'.log();
-
+abstract class CanWalk {
+  void walk(){
+    'Walking...'.log();
   }
 }
-class Dog extends CanRun {
-  const Dog(): super(type:Type.dog);
 
-}
+class Cat with CanRun, CanWalk {} //abstract class မှာ contructor မရှိလို့ mixin လုပ်လို့ရတာဖြစ်
+
+
 
 void testIt(){
-    final cat  = Cat(); // 'this' is now Cat
-    cat.type.log();  
-    final dog = Dog(); // 'this' is now Dog
-    dog.type.log();
+   
+   final cat = Cat();
+   cat
+   ..run()
+   ..walk();
   }
 
 void main() {
