@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:io';
+import 'package:meta/meta.dart';
 import 'package:flutter/material.dart';
 import 'dart:developer' as devtools show log;
 
@@ -5,34 +8,38 @@ extension Log on Object {
   void log() => devtools.log(toString());
 }
 
-// Let's now talk about constraint on mixin
-// This allow you to limit who the mixin can be used on
+//Mixins together with extensions are very powerful
 
-abstract class Animal {
-  const Animal();
-}
-// Animal abstract class အတွက်ပဲသုံးလို့ရမယ်ဆိုပြီးသတ်မှတ်လိုက်တာဖြစ်
-mixin CanRun on Animal{ 
-  int get speed;
+extension GetOnUri on Object {
+  Future<HttpClientResponse> getUrl(String url) 
+  =>HttpClient()
+  .getUrl(Uri.parse(url))
+  .then((req) => req.close());
 
-  // not abstract function, but logic function
-  void run(){
-    'Running at the speed of $speed'.log();
-  }
 }
-//ပြီးရင် ဒီမှာ cat က Animal ကို extendsလာလုပ်
-class Cat extends Animal with CanRun { 
+
+mixin CanMakeGetCall {
+  String get url;
   
-  //speed ကရှိကိုရှိရမယ်-ဒီလို assign လုပ်တယ်
+  @useResult
+  Future<String> getString()=>
+  getUrl(url)
+  .then((res) => res.transform(utf8.decoder).join());
+}
+
+@immutable
+class GetPeople with CanMakeGetCall {
+
+  
   @override
-  int speed=10;
+ 
+  String get url => 'http://127.0.0.1:5500/api/people.json';
+  
 }
 //to test
-void testIt() {
-final cat = Cat();
-cat.run();
-cat.speed = 20;
-cat.run();
+void testIt() async{
+final people = await  GetPeople().getString();
+people.log();
 }
 void main() {
   runApp(MyApp());
