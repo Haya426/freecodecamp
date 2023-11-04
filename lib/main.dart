@@ -8,10 +8,9 @@ extension Log on Object {
   void log() => devtools.log(toString());
 }
 
-//isolate အကြောင်းဖတ်မယ်
-// event loop အကြောင်းဖတ်မယ်
-// main isolate က app UI အတွက်သုံးတယ် 
-//isolate တစ်ခုနဲ့တစ်ခု message passing အတွက် port ကိုသုံးတယ်
+//အရင်program မှာဆိုရင် persons ကိုတစ်ခါပဲပြန်လိုက်တယ်
+// receive port က stream ဖြစ်တဲ့အတွက် တန်ဖိုးတွေ continuously communicate လုပ်နိင်ဖို့လိုတယ်
+// အဲဒီတော့ အခုတစ်ခါ data ကို 10 ကြိမ် stream နဲ့ communicate လုပ်ကြရအောင်
 
 
 void main() {
@@ -31,22 +30,28 @@ class Person {
   age = json["age"] as int;
 }
 
-Future<Iterable<Person>> getPersons() async {
+Stream<String> getMessages(){
   final rp = ReceivePort();
-  await Isolate.spawn(_getPersons,rp.sendPort);
-  return await rp.first; // receipt port is stream 
+  return Isolate.spawn(_getMessages,rp.sendPort)
+  .asStream() // steam ပြောင်းမယ်
+  .asyncExpand((_) => rp) //change to receive port data type
+  .takeWhile((element) => element is String) // string ဖြစ်တဲ့ဟာတွေကိုပဲရွေးသွားမယ်
+  .cast();
 }
-//define function to send value via port
-void _getPersons(SendPort sp) async {
-  const url = 'http://127.0.0.1:5500/apis/people1.json';
-  final persons = await HttpClient()
-  .getUrl(Uri.parse(url))
-  .then((req) => req.close())
-  .then((reponse) => reponse.transform(utf8.decoder).join())
-  .then((jsonString) => json.decode(jsonString)as List<dynamic>)
-  .then((json) => json.map((map) => Person.fromJson(map)));
-  
-  Isolate.exit(sp,persons);
+void _getMessages(SendPort sp) async {
+  await for (final now in  Stream.periodic(
+    const Duration(seconds: 1),
+    (_)=> DateTime.now().toIso8601String()).take(10)){
+      sp.send(now);
+    }
+    Isolate.exit(sp,); //အဆုံးမှာဘာမှ မထည့်ပေးလိုက်ဘူး
+    // Isolate.exit(sp,'hello'); အဆုံးမှာ hello ကို append လုပ်လိုက်တယ်
+}
+
+void testIt() async {
+  await for (final msg in getMessages()){
+    msg.log();
+  }
 }
 class MyApp extends StatelessWidget {
   
@@ -58,9 +63,8 @@ class MyApp extends StatelessWidget {
         appBar: AppBar(
           title: const Text('Flutter App'),
         ),
-        body: TextButton(onPressed: () async{
-          final persons = await getPersons();
-          persons.log();
+        body: TextButton(onPressed: () {
+          testIt();
         }, child: const Text('Press me'))
       ),
     );
