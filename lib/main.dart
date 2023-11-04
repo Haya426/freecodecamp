@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:isolate';
 import 'package:flutter/material.dart';
 import 'dart:developer' as devtools show log;
+import 'package:async/async.dart' show StreamGroup;
 
 extension Log on Object {
   void log() => devtools.log(toString());
@@ -25,33 +26,73 @@ class Person {
  const Person({
   required this.name, 
   required this.age});
+
   Person.fromJson(Map<String,dynamic> json):
   name = json["name"] as String,
   age = json["age"] as int;
+
+  @override
+  String toString() {
+    return 'Person (name: $name, age: $age)';
+  }
 }
 
-Stream<String> getMessages(){
-  final rp = ReceivePort();
-  return Isolate.spawn(_getMessages,rp.sendPort)
-  .asStream() // steam ပြောင်းမယ်
-  .asyncExpand((_) => rp) //change to receive port data type
-  .takeWhile((element) => element is String) // string ဖြစ်တဲ့ဟာတွေကိုပဲရွေးသွားမယ်
-  .cast();
-}
-void _getMessages(SendPort sp) async {
-  await for (final now in  Stream.periodic(
-    const Duration(seconds: 1),
-    (_)=> DateTime.now().toIso8601String()).take(10)){
-      sp.send(now);
+@immutable
+class  PersonRequest {
+  final ReceivePort receivePort;
+  final Uri uri;
+  const PersonRequest(this.receivePort, this.uri);
+
+  //Iterable ကိုသုံးပြီး instance ၃ ခုဖန်တီးမယ် 
+  static Iterable<PersonRequest> all() sync* {
+    for (final i in Iterable.generate(3,(i) => i)) {
+      yield PersonRequest(ReceivePort(),
+      Uri.parse('http://127.0.0.1:5500/apis/people${i+1}.json'));
     }
-    Isolate.exit(sp,); //အဆုံးမှာဘာမှ မထည့်ပေးလိုက်ဘူး
-    // Isolate.exit(sp,'hello'); အဆုံးမှာ hello ကို append လုပ်လိုက်တယ်
+  }
+  
 }
+@immutable
+class Request {
+final SendPort sendPort;
+final Uri uri;
+  const Request(this.sendPort, this.uri);
+
+  Request.from(PersonRequest request) 
+  : sendPort = request.receivePort.sendPort,
+  uri = request.uri;
+}
+
+Stream<Iterable<Person>> getPersons() {
+  final streams = PersonRequest
+              .all()
+              .map((req) => 
+              Isolate.spawn(_getPersons,Request.from(req))
+              .asStream()
+              .asyncExpand((_) => req.receivePort)
+              .takeWhile((element) => element is Iterable<Person>)
+              .cast())
+              ;
+  return StreamGroup.merge(streams).cast();
+}
+void _getPersons(Request request) async {
+  final persons = await HttpClient()
+  .getUrl(request.uri)
+  .then((req) => req.close())
+  .then((reponse) => reponse.transform(utf8.decoder).join())
+  .then((jsonString) => json.decode(jsonString)as List<dynamic>)
+  .then((json) => json.map((map) => Person.fromJson(map)));
+
+  Isolate.exit(request.sendPort,persons);
+  // request.sendPort.send(persons);
+}
+
 
 void testIt() async {
-  await for (final msg in getMessages()){
+  await for (final msg in getPersons()){
     msg.log();
   }
+  
 }
 class MyApp extends StatelessWidget {
   
