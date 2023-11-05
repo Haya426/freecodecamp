@@ -1,0 +1,8 @@
+-asyn နဲ့ await ကိုသုံးရခြင်းရဲ့အကြောင်းကိုလေ့လာကြည့်ရအောင်
+
+-debug console မှာ Instance of 'Future<Iterable<Person>>' ဆိုပြီးပြရင် package နဲ့ ပြတာဖြစ်ပါတယ်
+အထဲမှာ content တွေကိုထုတ်ချင်ရင်တော့ async နဲ့ await ကိုသုံးရပါတယ်
+
+- in order to open a package or a future or a stream, you need to await on it.
+
+- testIt function ကိုခေါ်တဲ့အချိန်ဘာလို့ await ကိုမသုံးတာလဲဆိုတော့ void function ဖြစ်နေလို့။ result ကိုစောင့်စရာမလိုလို့ပေါ့
