@@ -50,22 +50,24 @@ extension EmptyOnError<E> on Future<List<Iterable<E>>> {
     (_,__)=> Iterable<E>.empty()
   );
   }
-void testIt() async {
-
- final result = Future.forEach(
-  Iterable.generate(
+  //this asynchronous stream generator is not available in other programmng languages
+   // |-----[P1, P2,...]-----[P4, P5, P6,....] -----|
+ Stream<Iterable<Person>> getPersons() async* {
+  for (final url in Iterable.generate(
     2,
     (i)=> 'http://127.0.0.1:5500/apis/people${i+1}.json'
-  ), 
-  parseJson // auto pass url argument to this function
-  ).catchError((_,__)=>-1);  // if successful, return null
-
-  if (result != null) {
-    'Error occured'.log();
+  )){
+    yield await parseJson(url);
   }
- 
-
+ }
+void testIt() async {
+ // how to consume above stream
+ await for (final person in getPersons()){
+  person.log();
+ }
 }
+
+
 void main() {
   runApp(MyApp());
 }
