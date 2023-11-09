@@ -1,8 +1,10 @@
--asyn နဲ့ await ကိုသုံးရခြင်းရဲ့အကြောင်းကိုလေ့လာကြည့်ရအောင်
+ဒီတစ်ခါမှာတော့ Future တွေအများကြီးကို စုပြီး future တစ်ခုအနေနဲ့ပဲဖမ်းချင်တယ်ဆိုရင် ဘာသုံးမလဲ
 
--debug console မှာ Instance of 'Future<Iterable<Person>>' ဆိုပြီးပြရင် package နဲ့ ပြတာဖြစ်ပါတယ်
-အထဲမှာ content တွေကိုထုတ်ချင်ရင်တော့ async နဲ့ await ကိုသုံးရပါတယ်
+အဲဒီအတွက် Future.wait() ကိုသုံးလို့ရပါတယ်..အထဲမှာ Future object list ရှိမယ်
 
-- in order to open a package or a future or a stream, you need to await on it.
+Future.wait() is a method that allows you to wait for a list of Future objects to complete before performing some action
 
-- testIt function ကိုခေါ်တဲ့အချိန်ဘာလို့ await ကိုမသုံးတာလဲဆိုတော့ void function ဖြစ်နေလို့။ result ကိုစောင့်စရာမလိုလို့ပေါ့
+(_,__) ရဲ့သဘောသတရား
+first argument dynamic _
+second argument dynamic __
+variable လိုကိုယ်စားပြုတဲ့အတွက် argument တွေကတူလို့မရဘူး
