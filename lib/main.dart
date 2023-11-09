@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:isolate';
 import 'package:flutter/material.dart';
 import 'dart:developer' as devtools show log;
 
@@ -43,11 +42,13 @@ class GetPeople with ListOfThingsAPI<Map<String,dynamic>> {
   get(url).then((jsons) => jsons.map((json) => Person.fromJson(json)));
 }
 void testIt() async {
-final people = await GetApiEndPoints().get('http://127.0.0.1:5500/apis/apis.json')
-.then((urls) => Future.wait(
-  urls.map((url) => GetPeople().getPeople(url))
-));
- people.log();
+await for (final people in Stream.periodic(
+  const Duration(seconds: 3)
+  ).asyncExpand((_) => GetPeople()
+  .getPeople('http://127.0.0.1:5500/apis/people1.json')
+  .asStream())){
+  people.log();
+}
 }
 
 
