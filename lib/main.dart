@@ -34,18 +34,25 @@ Future<Iterable<Person>> parseJson(String url) =>HttpClient()
 .then((str) => json.decode(str) as List<dynamic>)
 .then((json) => json.map((e) => Person.fromJson(e)));
 
+
+  //error handling on future list
 extension EmptyOnError<E> on Future<List<Iterable<E>>> {
   Future<List<Iterable<E>>> emptyOnError() => catchError(
     (_,__)=> List<Iterable<E>>.empty()
   );
-
-}
+  }
+  //error handling on per future
+  extension EmptyOnErrorOnFuture<E> on Future<Iterable<E>> {
+  Future<Iterable<E>> emptyOnError() => catchError(
+    (_,__)=> Iterable<E>.empty()
+  );
+  }
 void testIt() async {
 
   final persons = await Future.wait([
-    parseJson(people1Url), //အထဲမှာတစ်ခုချင်းစီဖမ်းလို့လည်းရတယ်
-    parseJson(people2Url)
-  ]).emptyOnError();
+    parseJson(people1Url).emptyOnError(), //အထဲမှာတစ်ခုချင်းစီဖမ်းလို့လည်းရတယ်
+    parseJson(people2Url).emptyOnError()
+  ]);
 
   persons.log();
 
