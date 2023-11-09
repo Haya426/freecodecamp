@@ -4,6 +4,9 @@ import 'dart:isolate';
 import 'package:flutter/material.dart';
 import 'dart:developer' as devtools show log;
 
+//use future.wait() if you want result
+//use future.forEach() if you don't care about result
+
 extension Log on Object {
   void log() => devtools.log(toString());
 }
@@ -49,12 +52,18 @@ extension EmptyOnError<E> on Future<List<Iterable<E>>> {
   }
 void testIt() async {
 
-  final persons = await Future.wait([
-    parseJson(people1Url).emptyOnError(), //အထဲမှာတစ်ခုချင်းစီဖမ်းလို့လည်းရတယ်
-    parseJson(people2Url).emptyOnError()
-  ]);
+ final result = Future.forEach(
+  Iterable.generate(
+    2,
+    (i)=> 'http://127.0.0.1:5500/apis/people${i+1}.json'
+  ), 
+  parseJson // auto pass url argument to this function
+  ).catchError((_,__)=>-1);  // if successful, return null
 
-  persons.log();
+  if (result != null) {
+    'Error occured'.log();
+  }
+ 
 
 }
 void main() {
