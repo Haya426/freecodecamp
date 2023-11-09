@@ -26,45 +26,28 @@ class Person {
   @override
   String toString() => 'Person ($name, $age years old )';
 }
+mixin ListOfThingsAPI<T> {
 
-const people1Url = 'http://127.0.0.1:5500/apis/people1.json';
-const people2Url = 'http://127.0.0.1:5500/apis/people23.json';
-
-Future<Iterable<Person>> parseJson(String url) =>HttpClient()
+Future<Iterable<T>> get(String url) => HttpClient()
 .getUrl(Uri.parse(url))
 .then((req) => req.close())
 .then((resp) => resp.transform(utf8.decoder).join())
 .then((str) => json.decode(str) as List<dynamic>)
-.then((json) => json.map((e) => Person.fromJson(e)));
+.then((list) => list.cast());
+}
 
-
-  //error handling on future list
-extension EmptyOnError<E> on Future<List<Iterable<E>>> {
-  Future<List<Iterable<E>>> emptyOnError() => catchError(
-    (_,__)=> List<Iterable<E>>.empty()
-  );
-  }
-  //error handling on per future
-  extension EmptyOnErrorOnFuture<E> on Future<Iterable<E>> {
-  Future<Iterable<E>> emptyOnError() => catchError(
-    (_,__)=> Iterable<E>.empty()
-  );
-  }
-  //this asynchronous stream generator is not available in other programmng languages
-   // |-----[P1, P2,...]-----[P4, P5, P6,....] -----|
- Stream<Iterable<Person>> getPersons() async* {
-  for (final url in Iterable.generate(
-    2,
-    (i)=> 'http://127.0.0.1:5500/apis/people${i+1}.json'
-  )){
-    yield await parseJson(url);
-  }
- }
+class GetApiEndPoints with ListOfThingsAPI<String> {
+} 
+class GetPeople with ListOfThingsAPI<Map<String,dynamic>> {
+  Future<Iterable<Person>> getPeople(String url) => 
+  get(url).then((jsons) => jsons.map((json) => Person.fromJson(json)));
+}
 void testIt() async {
- // how to consume above stream
- await for (final person in getPersons()){
-  person.log();
- }
+final people = await GetApiEndPoints().get('http://127.0.0.1:5500/apis/apis.json')
+.then((urls) => Future.wait(
+  urls.map((url) => GetPeople().getPeople(url))
+));
+ people.log();
 }
 
 
