@@ -1,5 +1,5 @@
-import 'dart:convert';
-import 'dart:io';
+import 'dart:async';
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'dart:developer' as devtools show log;
 
@@ -9,67 +9,65 @@ import 'dart:developer' as devtools show log;
 extension Log on Object {
   void log() => devtools.log(toString());
 }
-@immutable
-class Person {
-  final String name;
-  final int age;
 
-  const Person({ 
-    required this.name, 
-    required this.age});
+const names = [
+  'Phong',
+  'Dee',
+  'Jhon',
+  'Sin'
+];
 
-  Person.fromJson(Map<String,dynamic> json) :
-  name = json["name"] as String,
-  age = json["age"] as int;
-  
+extension RandomElement<T> on Iterable<T> {
+  T getRandomElement() => elementAt(math.Random().nextInt(length));
+}
+
+class UpperCaseSink implements EventSink<String> {
+  final EventSink<String> _sink;
+
+  const UpperCaseSink(this._sink);
+
   @override
-  String toString() => 'Person ($name, $age years old )';
-}
-mixin ListOfThingsAPI<T> {
+  void add(String event) => _sink.add(event.toUpperCase());
 
-Future<Iterable<T>> get(String url) => HttpClient()
-.getUrl(Uri.parse(url))
-.then((req) => req.close())
-.then((resp) => resp.transform(utf8.decoder).join())
-.then((str) => json.decode(str) as List<dynamic>)
-.then((list) => list.cast());
+  @override
+  void addError(Object error, [StackTrace? stackTrace]) =>
+      _sink.addError(error, stackTrace);
+
+  @override
+  void close() => _sink.close();
 }
 
-class GetApiEndPoints with ListOfThingsAPI<String> {
-} 
-class GetPeople with ListOfThingsAPI<Map<String,dynamic>> {
-  Future<Iterable<Person>> getPeople(String url) => 
-  get(url).then((jsons) => jsons.map((json) => Person.fromJson(json)));
+class StreamTransformerUpperCase extends StreamTransformerBase<String, String> {
+  @override
+  Stream<String> bind(Stream<String> stream) =>
+      Stream<String>.eventTransformed(stream, (sink) => UpperCaseSink(sink));
 }
+
 void testIt() async {
-await for (final people in Stream.periodic(
-  const Duration(seconds: 3)
-  ).asyncExpand((_) => GetPeople()
-  .getPeople('http://127.0.0.1:5500/apis/people1.json')
-  .asStream())){
-  people.log();
+  await for (final name in Stream.periodic(
+          const Duration(seconds: 1), (_) => names.getRandomElement())
+      .transform(StreamTransformerUpperCase())) {
+    name.log();
+  }
 }
-}
-
 
 void main() {
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  
   @override
   Widget build(BuildContext context) {
-    
     return MaterialApp(
       home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Flutter App'),
-        ),
-        body: TextButton(onPressed: () {
-          testIt();
-        }, child: const Text('Press me'))
-      ),
+          appBar: AppBar(
+            title: const Text('Flutter App'),
+          ),
+          body: TextButton(
+              onPressed: () {
+                testIt();
+              },
+              child: const Text('Press me'))),
     );
   }
 }
